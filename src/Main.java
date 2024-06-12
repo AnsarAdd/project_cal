@@ -1,15 +1,35 @@
+//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
+// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+
+ /*Создай консольное приложение "Калькулятор". Приложение должно читать из консоли введенные пользователем строки, числа,
+ арифметические операции проводимые между ними и выводить в консоль результат их выполнения.
+ Реализуй класс Main с методом public static String calc(String input).
+ Метод должен принимать строку с арифметическим выражением между двумя числами и возвращать строку с результатом их выполнения.
+ Ты можешь добавлять свои импорты, классы и методы. Добавленные классы не должны иметь модификаторы доступа (public или другие).*/
+
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //В работе есть исключения на случаи предусмотренные заданием. Некоторые исключения по умолчанию - их не трогал
 //некоторых не было - создал.
 public class Main {
-    private static boolean isRoman(char c){
+    public static void main(String[] args) throws IOException {
+        Scanner in = new Scanner(System.in);
+        String ex = in.nextLine();
+        validateExpression(ex);
+        System.out.println(calc(ex));
+
+    }
+
+    private static boolean isRoman(char c) {
         if (c == 'I' | c == 'V' | c == 'X')
             return true;
         else return false;
     }
-    private static int romanToInteger (String roman) {
+
+    private static int romanToInteger(String roman) {
         switch (roman) {
             case "I":
                 return 1;
@@ -34,7 +54,8 @@ public class Main {
         }
         return -1;
     }
-    private static String integerToRoman(int num){
+
+    private static String integerToRoman(int num) {
         //число соответсвует индексу латинской записи
         String[] romanNums = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX",
                 "XXI", "XXII", "XXIII", "XXIV", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXX", "XXXI", "XXXII", "XXXIII", "XXXIV", "XXXV", "XXXVI", "XXXVII", "XXXVIII", "XXXIX", "XL",
@@ -46,7 +67,20 @@ public class Main {
         };
         return romanNums[num];
     }
-    public static String calc(String inputString) throws IOException{
+
+    private static void validateExpression(String inputString) throws IOException {
+        Pattern pattern = Pattern.compile("(\\+|\\*|-|\\/)");
+        Matcher matcher = pattern.matcher(inputString);
+        int matches = 0;
+        while (matcher.find()) {
+            matches++;
+        }
+        if (matches != 1) {
+            throw new IOException("There are too many operators(max=1)");
+        }
+    }
+
+    public static String calc(String inputString) throws IOException {
         //пришлось инициализировать некоторые переменные, так как среда ругалась
         int num1, num2, operators = 0, res = 111;
         char op = '1';
@@ -54,19 +88,24 @@ public class Main {
         //удаление всех пробельных символов
         inputString = inputString.replaceAll("\\s+", "");
 
-        if (inputString.lastIndexOf("+") != -1){
+
+        if (inputString.lastIndexOf("+") != -1) {
             op = '+';
             operators++;
-        } else if (inputString.lastIndexOf("-") != -1) {
+        }
+        if (inputString.lastIndexOf("-") != -1) {
             op = '-';
             operators++;
-        } else if (inputString.lastIndexOf("/") != -1) {
+        }
+        if (inputString.lastIndexOf("/") != -1) {
             op = '/';
             operators++;
-        } else if (inputString.lastIndexOf("*") != -1) {
+        }
+        if (inputString.lastIndexOf("*") != -1) {
             op = '*';
             operators++;
         }
+
 
         //проверка наличия оператора или их количества большего, чем нужно
         if (operators != 1) throw new IOException();
@@ -74,12 +113,11 @@ public class Main {
         String[] nums = inputString.split("[+/*-]");
 
         //проверка соответсвия систем счисления
-        if (isRoman(nums[0].charAt(0)) == isRoman(nums[1].charAt(0))){
-            if (isRoman(nums[0].charAt(0))){
+        if (isRoman(nums[0].charAt(0)) == isRoman(nums[1].charAt(0))) {
+            if (isRoman(nums[0].charAt(0))) {
                 num1 = romanToInteger(nums[0]);
                 num2 = romanToInteger(nums[1]);
-            }
-            else {
+            } else {
                 num1 = Integer.parseInt(nums[0]);
                 num2 = Integer.parseInt(nums[1]);
             }
@@ -89,7 +127,7 @@ public class Main {
         //проверка соответствия введенных значений условию от 1 до 10
         if (num1 < 1 | num2 < 1 | num1 > 10 | num2 > 10) throw new IOException();
         //произведение операции согласно оператору в исходном выражении
-        switch (op){
+        switch (op) {
             case '+':
                 res = num1 + num2;
                 break;
@@ -103,14 +141,10 @@ public class Main {
                 res = num1 * num2;
                 break;
         }
-        if ((isRoman(nums[0].charAt(0)) & res < 1) | res == 111)throw new IOException();
+        if ((isRoman(nums[0].charAt(0)) & res < 1) | res == 111) throw new IOException();
 
         if (isRoman(nums[0].charAt(0))) return integerToRoman(res);
         else return Integer.toString(res);
     }
-    public static void main(String[] args) throws IOException{
-        Scanner in = new Scanner(System.in);
-        String ex = in.nextLine();
-        System.out.println(calc(ex));
-    }
+
 }
